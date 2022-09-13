@@ -72,7 +72,7 @@ public partial class MainWindow : INotifyPropertyChanged
     }
 
     private bool _isUsingDuration;
-
+    
     public bool IsUsingDuration
     {
         get => _isUsingDuration;
@@ -88,6 +88,76 @@ public partial class MainWindow : INotifyPropertyChanged
         }
     }
 
+    private bool ImageCropMouseDown { get; set; } = false;
+    
+    private int ImageCropStartXPreview { get; set; }
+    
+    private int ImageCropStartYPreview { get; set; }
+
+    private int ImageCropEndXPreview { get; set; }
+    
+    private int ImageCropEndYPreview { get; set; }
+
+    
+    private int _imageCropStartX;
+
+    public int ImageCropStartX
+    {
+        get => _imageCropStartX;
+        set
+        {
+            if (value == _imageCropStartX)
+                return;
+
+            _imageCropStartX = value;
+            NotifyPropertyChanged();
+        }
+    }
+    private int _imageCropStartY;
+
+    public int ImageCropStartY
+    {
+        get => _imageCropStartY;
+        set
+        {
+            if (value == _imageCropStartY)
+                return;
+
+            _imageCropStartY = value;
+            NotifyPropertyChanged();
+        }
+    }
+    
+    private int _imageCropEndX;
+
+    public int ImageCropEndX
+    {
+        get => _imageCropEndX;
+        set
+        {
+            if (value == _imageCropEndX)
+                return;
+
+            _imageCropEndX = value;
+            NotifyPropertyChanged();
+        }
+    }
+    
+    private int _imageCropEndY;
+
+    public int ImageCropEndY
+    {
+        get => _imageCropEndY;
+        set
+        {
+            if (value == _imageCropEndY)
+                return;
+
+            _imageCropEndY = value;
+            NotifyPropertyChanged();
+        }
+    }
+
     #endregion
 
     #region Events
@@ -98,8 +168,8 @@ public partial class MainWindow : INotifyPropertyChanged
             $"IsCropEnabled: {IsCropEnabled}\n" +
             $"IsTrimEnabled: {IsTrimEnabled}\n" +
             $"IsUsingDuration: {IsUsingDuration}\n" +
-            $"StartPoint: {_imageCropStartPoint.X} - {_imageCropStartPoint.Y} \n" +
-            $"EndPoint:{_imageCropEndPoint.X} - {_imageCropEndPoint.Y}");
+            $"StartPoint: {ImageCropStartX} - {ImageCropStartY} \n" +
+            $"EndPoint:{ImageCropEndX} - {ImageCropEndY}");
     }
 
     private void BtnBrowse_Click(object sender, RoutedEventArgs e)
@@ -131,31 +201,42 @@ public partial class MainWindow : INotifyPropertyChanged
     }
 
     #endregion
-
-
-    private bool _trackCropStartPoint = true;
-    private Point _imageCropStartPoint;
-    private Point _imageCropEndPoint;
-
-    private void ImageFramePreview_OnMouseDown(object sender, MouseButtonEventArgs e)
+    
+    private void GridImagePreview_OnMouseMove(object sender, MouseEventArgs e)
     {
-        _trackCropStartPoint = false;
-        _imageCropStartPoint = e.GetPosition((Image)sender);
+        var pos = e.GetPosition((Grid) sender);
+        if (ImageCropMouseDown)
+        {
+            ImageCropEndXPreview = (int) pos.X;
+            ImageCropEndYPreview = (int) pos.Y;
+        }
+        else
+        {
+            ImageCropStartXPreview = (int) pos.X;
+            ImageCropStartYPreview = (int) pos.Y;
+        }
     }
 
-    private void ImageFramePreview_OnMouseUp(object sender, MouseButtonEventArgs e)
+    private void GridImagePreview_OnMouseDown(object sender, MouseButtonEventArgs e)
     {
-        _imageCropEndPoint = e.GetPosition((Image)sender);
-        _trackCropStartPoint = true;
-    }
-
-    private void ImageFramePreview_OnMouseMove(object sender, MouseEventArgs e)
-    {
-        if (!_trackCropStartPoint)
+        if (!IsCropEnabled)
         {
             return;
         }
+        ImageCropMouseDown = true;
+        ImageCropStartX = ImageCropStartXPreview;
+        ImageCropStartY = ImageCropStartYPreview;
+    }
 
-        _imageCropStartPoint = e.GetPosition((Image) sender);
+    private void GridImagePreview_OnMouseUp(object sender, MouseButtonEventArgs e)
+    {
+        if (!IsCropEnabled)
+        {
+            return;
+        }
+        
+        ImageCropEndX = ImageCropEndXPreview;
+        ImageCropEndY = ImageCropEndYPreview;
+        ImageCropMouseDown = false;
     }
 }
