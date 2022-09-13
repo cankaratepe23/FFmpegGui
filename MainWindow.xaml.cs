@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
@@ -88,7 +87,7 @@ public partial class MainWindow : INotifyPropertyChanged
         }
     }
 
-    private bool ImageCropMouseDown { get; set; } = false;
+    private bool ImageCropMouseDown { get; set; }
     
     private int ImageCropStartXPreview { get; set; }
     
