@@ -12,10 +12,9 @@
         TextBlock.Foreground="White">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="319*" />
+            <ColumnDefinition Width="*" />
             <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="1160*" />
-            <ColumnDefinition Width="118*" />
+            <ColumnDefinition Width="4*" />
         </Grid.ColumnDefinitions>
         <StackPanel Orientation="Vertical" Margin="0,10,0,0">
             <!-- File -->
@@ -191,8 +190,10 @@
             <!-- advanced parameters (under dropdown?) such as vcodec, acodec, include audio?, crf, bitrate etc.-->
 
         </StackPanel>
-        <StackPanel Orientation="Horizontal" Background="#FFD4D4D4" Width="3" Grid.ColumnSpan="2" Margin="319,0,0,0" />
-        <Image Grid.Column="2" Source="/res/sample square.png" Stretch="Uniform" Margin="20,20,20,20"
-               Grid.ColumnSpan="2" />
+        <StackPanel Grid.Column="1" Orientation="Horizontal" Background="#FFD4D4D4" Width="3" Margin="0,0,0,0" />
+        <Grid Grid.Column="2">
+            <Image x:Name="ImageFramePreview" Source="/res/sample square.png" Stretch="Uniform" Margin="20,20,20,20"
+                   MouseMove="ImageFramePreview_OnMouseMove" MouseDown="ImageFramePreview_OnMouseDown" MouseUp="ImageFramePreview_OnMouseUp"/>
+        </Grid>
     </Grid>
 </Window>

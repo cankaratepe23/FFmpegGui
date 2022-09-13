@@ -1,6 +1,8 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using Microsoft.Win32;
 
@@ -93,7 +95,11 @@ public partial class MainWindow : INotifyPropertyChanged
     private void BtnConvert_Click(object sender, RoutedEventArgs e)
     {
         MessageBox.Show(
-            $"IsCropEnabled: {IsCropEnabled}\nIsTrimEnabled: {IsTrimEnabled}\nIsUsingDuration: {IsUsingDuration}");
+            $"IsCropEnabled: {IsCropEnabled}\n" +
+            $"IsTrimEnabled: {IsTrimEnabled}\n" +
+            $"IsUsingDuration: {IsUsingDuration}\n" +
+            $"StartPoint: {_imageCropStartPoint.X} - {_imageCropStartPoint.Y} \n" +
+            $"EndPoint:{_imageCropEndPoint.X} - {_imageCropEndPoint.Y}");
     }
 
     private void BtnBrowse_Click(object sender, RoutedEventArgs e)
@@ -125,4 +131,31 @@ public partial class MainWindow : INotifyPropertyChanged
     }
 
     #endregion
+
+
+    private bool _trackCropStartPoint = true;
+    private Point _imageCropStartPoint;
+    private Point _imageCropEndPoint;
+
+    private void ImageFramePreview_OnMouseDown(object sender, MouseButtonEventArgs e)
+    {
+        _trackCropStartPoint = false;
+        _imageCropStartPoint = e.GetPosition((Image)sender);
+    }
+
+    private void ImageFramePreview_OnMouseUp(object sender, MouseButtonEventArgs e)
+    {
+        _imageCropEndPoint = e.GetPosition((Image)sender);
+        _trackCropStartPoint = true;
+    }
+
+    private void ImageFramePreview_OnMouseMove(object sender, MouseEventArgs e)
+    {
+        if (!_trackCropStartPoint)
+        {
+            return;
+        }
+
+        _imageCropStartPoint = e.GetPosition((Image) sender);
+    }
 }
