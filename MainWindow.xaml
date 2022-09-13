@@ -1,0 +1,198 @@
+﻿<Window x:Class="FFmpegGui.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        DataContext="{Binding RelativeSource={RelativeSource Self}}"
+        Title="FFmpeg GUI"
+        Height="720"
+        Width="1600"
+        Background="#161616"
+        TextBlock.Foreground="White">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="319*" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="1160*" />
+            <ColumnDefinition Width="118*" />
+        </Grid.ColumnDefinitions>
+        <StackPanel Orientation="Vertical" Margin="0,10,0,0">
+            <!-- File -->
+            <Grid Margin="5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Padding="5,2,5,2" Grid.Column="0">File:</TextBlock>
+                <TextBox x:Name="TxtFilePath" Padding="2" Grid.Column="1" MinWidth="100" />
+                <Button x:Name="BtnBrowse" Padding="5,2,5,2" Grid.Column="2" Click="BtnBrowse_Click">Browse...</Button>
+            </Grid>
+
+            <!-- Timestamp -->
+            <Grid Margin="5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Padding="5,2,5,2" Grid.Column="0">Timestamp:</TextBlock>
+                <TextBox x:Name="TxtTimestamp" Padding="2" Grid.Column="1" MinWidth="100" Text="00:00:00.000" />
+                <Grid Grid.Column="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Button x:Name="BtnRewindFast" Padding="5,2,5,2" Grid.Column="0" Content="&lt;&lt;" />
+                    <Button x:Name="BtnRewind" Padding="5,2,5,2" Grid.Column="1" Content="&lt;" />
+                    <Button x:Name="BtnForward" Padding="5,2,5,2" Grid.Column="2" Content="&gt;" />
+                    <Button x:Name="BtnForwardFast" Padding="5,2,5,2" Grid.Column="3" Content="&gt;&gt;" />
+                </Grid>
+            </Grid>
+
+            <!-- Frame no. -->
+            <Grid Margin="5" Visibility="Collapsed">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Margin="0,0,26,0" Padding="5,2,5,2" Grid.Column="0">Frame:</TextBlock>
+                <TextBox Padding="2" Grid.Column="1" MinWidth="100" Text="0" />
+                <Grid Grid.Column="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Button Padding="5,2,5,2" Grid.Column="0" Content="&lt;&lt;" />
+                    <Button Padding="5,2,5,2" Grid.Column="1" Content="&lt;" />
+                    <Button Padding="5,2,5,2" Grid.Column="2" Content="&gt;" />
+                    <Button Padding="5,2,5,2" Grid.Column="3" Content="&gt;&gt;" />
+                </Grid>
+            </Grid>
+
+            <!-- From/To -->
+            <GroupBox BorderThickness="0" Background="#282828">
+                <StackPanel Orientation="Vertical">
+                    <CheckBox x:Name="ChkTrimEnabled" Foreground="White" Content="Trim?"
+                              IsChecked="{Binding IsTrimEnabled,Mode=TwoWay}" />
+                    <Grid Margin="5" IsEnabled="{Binding IsTrimEnabled}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <Grid Grid.Column="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Padding="5,2,5,2" Grid.Column="0">From:</TextBlock>
+                            <TextBox x:Name="TxtFromTimestamp" Padding="2" Grid.Column="1" MinWidth="100"
+                                     Text="00:00:00.000" />
+                        </Grid>
+                        <Grid x:Name="GrdToAndDurationGrid" MouseDown="GrdToAndDurationGrid_MouseDown" Grid.Column="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem x:Name="MenuDurationSwitch" Click="MenuDurationSwitch_Click"
+                                              Header="Switch" />
+                                </ContextMenu>
+                            </Grid.ContextMenu>
+                            <TextBlock x:Name="LblToLabel" Padding="5,2,5,2" Grid.Column="0"
+                                       Visibility="{Binding IsUsingDuration, Converter={StaticResource InvertedBooleanToVisibilityConverter}}">
+                                To:
+                            </TextBlock>
+                            <TextBlock x:Name="LblDurationLabel" Padding="5,2,5,2" Grid.Column="0"
+                                       Visibility="{Binding IsUsingDuration, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}">
+                                Duration:
+                            </TextBlock>
+                            <TextBox x:Name="TxtDurationToTimestamp" Padding="2" Grid.Column="1" MinWidth="100"
+                                     Text="00:00:00.000" />
+                        </Grid>
+                    </Grid>
+                </StackPanel>
+            </GroupBox>
+
+            <!-- Crop parameters textboxes -->
+            <!-- TODO: Check if these parameters match directly to vfcrop's input values -->
+            <GroupBox BorderThickness="0" Background="#282828">
+                <StackPanel Orientation="Vertical">
+                    <CheckBox x:Name="ChkCropEnabled" Foreground="White" Content="Crop?"
+                              IsChecked="{Binding IsCropEnabled,Mode=TwoWay}" />
+                    <Grid Margin="5" IsEnabled="{Binding IsCropEnabled}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <Grid Grid.Column="0" Grid.Row="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Margin="0,0,25,0" Padding="5,2,5,2" Grid.Column="0">X:</TextBlock>
+                            <TextBox Padding="2" Grid.Column="1" Text="0" />
+                        </Grid>
+                        <Grid Grid.Column="1" Grid.Row="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Margin="0,0,29,0" Padding="5,2,5,2" Grid.Column="0">Y:</TextBlock>
+                            <TextBox Padding="2" Grid.Column="1" Text="0" />
+                        </Grid>
+
+                        <Grid Grid.Column="0" Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Padding="5,2,5,2" Grid.Column="0">Width:</TextBlock>
+                            <TextBox Padding="2" Grid.Column="1" Text="0" />
+                        </Grid>
+                        <Grid Grid.Column="1" Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Padding="5,2,5,2" Grid.Column="0">Height:</TextBlock>
+                            <TextBox Padding="2" Grid.Column="1" Text="0" />
+                        </Grid>
+                    </Grid>
+                </StackPanel>
+            </GroupBox>
+
+            <!-- Convert buttons -->
+            <Grid Height="24" Margin="5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Button x:Name="BtnConvert" Click="BtnConvert_Click" Margin="0,0,1,0" Grid.Column="0">Convert</Button>
+                <Button x:Name="BtnGifski" Margin="1,0,0,0" Grid.Column="1">gifski</Button>
+            </Grid>
+
+            <!-- TODO -->
+            <!-- crop operation controls -->
+            <!-- one click convert to gif w/ needed controls/parameters -->
+            <!-- advanced parameters (under dropdown?) such as vcodec, acodec, include audio?, crf, bitrate etc.-->
+
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Background="#FFD4D4D4" Width="3" Grid.ColumnSpan="2" Margin="319,0,0,0" />
+        <Image Grid.Column="2" Source="/res/sample square.png" Stretch="Uniform" Margin="20,20,20,20"
+               Grid.ColumnSpan="2" />
+    </Grid>
+</Window>
