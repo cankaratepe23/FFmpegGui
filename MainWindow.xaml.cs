@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -14,6 +15,13 @@ namespace FFmpegGui;
 /// </summary>
 public partial class MainWindow : INotifyPropertyChanged
 {
+    private static string _userLogText = "";
+
+    public MainWindow()
+    {
+        InitializeComponent();
+    }
+
     public static bool IsDebug
     {
 #if DEBUG
@@ -32,12 +40,24 @@ public partial class MainWindow : INotifyPropertyChanged
 #endif
     }
 
-    public MainWindow()
+    public static string UserLogText
     {
-        InitializeComponent();
+        get => _userLogText;
+        set
+        {
+            if (_userLogText == value)
+            {
+                return;
+            }
+
+            _userLogText = value;
+            StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(nameof(UserLogText)));
+        }
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
+
+    public static event PropertyChangedEventHandler? StaticPropertyChanged;
 
     private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
     {
@@ -126,7 +146,9 @@ public partial class MainWindow : INotifyPropertyChanged
         set
         {
             if (value == _imageCropStartX)
+            {
                 return;
+            }
 
             _imageCropStartX = value;
             NotifyPropertyChanged();
@@ -141,7 +163,9 @@ public partial class MainWindow : INotifyPropertyChanged
         set
         {
             if (value == _imageCropStartY)
+            {
                 return;
+            }
 
             _imageCropStartY = value;
             NotifyPropertyChanged();
@@ -156,7 +180,9 @@ public partial class MainWindow : INotifyPropertyChanged
         set
         {
             if (value == _imageCropEndX)
+            {
                 return;
+            }
 
             _imageCropEndX = value;
             NotifyPropertyChanged();
@@ -171,7 +197,9 @@ public partial class MainWindow : INotifyPropertyChanged
         set
         {
             if (value == _imageCropEndY)
+            {
                 return;
+            }
 
             _imageCropEndY = value;
             NotifyPropertyChanged();
@@ -185,23 +213,25 @@ public partial class MainWindow : INotifyPropertyChanged
     private void BtnConvert_Click(object sender, RoutedEventArgs e)
     {
         MessageBox.Show(
-            $"IsCropEnabled: {IsCropEnabled}\n" +
-            $"IsTrimEnabled: {IsTrimEnabled}\n" +
-            $"IsUsingDuration: {IsUsingDuration}\n" +
-            $"StartPoint: {ImageCropStartX} - {ImageCropStartY} \n" +
+            $"IsCropEnabled: {IsCropEnabled}" + Environment.NewLine +
+            $"IsTrimEnabled: {IsTrimEnabled}" + Environment.NewLine +
+            $"IsUsingDuration: {IsUsingDuration}" + Environment.NewLine +
+            $"StartPoint: {ImageCropStartX} - {ImageCropStartY} " + Environment.NewLine +
             $"EndPoint:{ImageCropEndX} - {ImageCropEndY}");
     }
 
-    private void BtnGifski_OnClick(object sender, RoutedEventArgs e)
+    private async void BtnGifski_OnClick(object sender, RoutedEventArgs e)
     {
-        if (!GifskiService.IsGifskiInstalled())
+        if (!await GifskiService.IsGifskiInstalledAsync())
         {
             var style = new Style();
             style.Setters.Add(new Setter(Xceed.Wpf.Toolkit.MessageBox.CancelButtonContentProperty, "Go to website..."));
             var result = Xceed.Wpf.Toolkit.MessageBox.Show(
-                "Could not find gifski.\n" +
+                "Could not find gifski." + Environment.NewLine +
                 "Install it by downloading the latest command-line binaries from https://gif.ski/ " +
-                $"and either add it to your PATH or place it in\n{Directory.GetCurrentDirectory()}\n\n" +
+                "and either add it to your PATH or place it in"
+                + Environment.NewLine + Directory.GetCurrentDirectory()
+                + Environment.NewLine + Environment.NewLine +
                 "Would you like to try to install gifski automatically?",
                 "Could not find gifski",
                 MessageBoxButton.YesNoCancel,
@@ -211,7 +241,7 @@ public partial class MainWindow : INotifyPropertyChanged
             // TODO: Complete this
             if (MessageBoxResult.Yes == result)
             {
-                // GifskiService.DownloadGifski();
+                await Task.Run(GifskiService.InstallGifskiAsync);
             }
             else if (MessageBoxResult.Cancel == result)
             {
@@ -252,8 +282,6 @@ public partial class MainWindow : INotifyPropertyChanged
         }
     }
 
-    #endregion
-
     private void GridImagePreview_OnMouseMove(object sender, MouseEventArgs e)
     {
         var pos = e.GetPosition((Grid) sender);
@@ -292,4 +320,6 @@ public partial class MainWindow : INotifyPropertyChanged
         ImageCropEndY = ImageCropEndYPreview;
         ImageCropMouseDown = false;
     }
+    
+    #endregion
 }

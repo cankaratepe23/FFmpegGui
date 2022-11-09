@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        xmlns:local="clr-namespace:FFmpegGui"
         mc:Ignorable="d"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         Title="FFmpeg GUI"
@@ -149,7 +150,8 @@
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
                             <TextBlock Margin="0,0,25,0" Padding="5,2,5,2" Grid.Column="0">X:</TextBlock>
-                            <xctk:IntegerUpDown Padding="2" Grid.Column="1" Text="{Binding ImageCropStartX, Mode=TwoWay}" />
+                            <xctk:IntegerUpDown Padding="2" Grid.Column="1"
+                                                Text="{Binding ImageCropStartX, Mode=TwoWay}" />
                         </Grid>
                         <Grid Grid.Column="1" Grid.Row="0">
                             <Grid.ColumnDefinitions>
@@ -157,7 +159,8 @@
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
                             <TextBlock Margin="0,0,29,0" Padding="5,2,5,2" Grid.Column="0">Y:</TextBlock>
-                            <xctk:IntegerUpDown Padding="2" Grid.Column="1" Text="{Binding ImageCropStartY, Mode=TwoWay}" />
+                            <xctk:IntegerUpDown Padding="2" Grid.Column="1"
+                                                Text="{Binding ImageCropStartY, Mode=TwoWay}" />
                         </Grid>
 
                         <Grid Grid.Column="0" Grid.Row="1">
@@ -190,6 +193,9 @@
                 <Button x:Name="BtnGifski" Click="BtnGifski_OnClick" Margin="1,0,0,0" Grid.Column="1">gifski</Button>
             </Grid>
 
+            <TextBlock x:Name="TxtBottomLogField" Padding="5,2,5,2" TextWrapping="Wrap"
+                       Text="{Binding Path=(local:MainWindow.UserLogText)}" />
+
             <!-- TODO -->
             <!-- crop operation controls -->
             <!-- one click convert to gif w/ needed controls/parameters -->
@@ -201,7 +207,7 @@
               MouseMove="GridImagePreview_OnMouseMove"
               MouseDown="GridImagePreview_OnMouseDown"
               MouseUp="GridImagePreview_OnMouseUp">
-            <Image x:Name="ImageFramePreview" Source="/res/sample square.png" Stretch="Uniform" Margin="20,20,20,20"/>
+            <Image x:Name="ImageFramePreview" Source="/res/sample square.png" Stretch="Uniform" Margin="20,20,20,20" />
         </Grid>
     </Grid>
 </Window>

@@ -8,9 +8,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <None Remove="res\sample landscape.png" />
-        <None Remove="res\sample square.png" />
-        <None Remove="res\sample ss.png" />
+        <None Remove="res\sample landscape.png"/>
+        <None Remove="res\sample square.png"/>
+        <None Remove="res\sample ss.png"/>
     </ItemGroup>
 
     <ItemGroup>
@@ -23,7 +23,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Extended.Wpf.Toolkit" Version="4.4.0" />
+        <PackageReference Include="Extended.Wpf.Toolkit" Version="4.4.0"/>
+        <PackageReference Include="HtmlAgilityPack" Version="1.11.46"/>
     </ItemGroup>
 
 </Project>
