@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
@@ -12,6 +13,24 @@ namespace FFmpegGui;
 /// </summary>
 public partial class MainWindow : INotifyPropertyChanged
 {
+    public static bool IsDebug
+    {
+#if DEBUG
+        get { return true; }
+#else
+        get { return false; }
+#endif
+    }
+    
+    public static bool IsNotDebug
+    {
+#if DEBUG
+        get { return false; }
+#else
+        get { return true; }
+#endif
+    }
+    
     public MainWindow()
     {
         InitializeComponent();
