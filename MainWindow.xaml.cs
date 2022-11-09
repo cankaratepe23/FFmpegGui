@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.IO;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
@@ -21,7 +22,7 @@ public partial class MainWindow : INotifyPropertyChanged
         get { return false; }
 #endif
     }
-    
+
     public static bool IsNotDebug
     {
 #if DEBUG
@@ -30,7 +31,7 @@ public partial class MainWindow : INotifyPropertyChanged
         get { return true; }
 #endif
     }
-    
+
     public MainWindow()
     {
         InitializeComponent();
@@ -90,7 +91,7 @@ public partial class MainWindow : INotifyPropertyChanged
     }
 
     private bool _isUsingDuration;
-    
+
     public bool IsUsingDuration
     {
         get => _isUsingDuration;
@@ -107,16 +108,16 @@ public partial class MainWindow : INotifyPropertyChanged
     }
 
     private bool ImageCropMouseDown { get; set; }
-    
+
     private int ImageCropStartXPreview { get; set; }
-    
+
     private int ImageCropStartYPreview { get; set; }
 
     private int ImageCropEndXPreview { get; set; }
-    
+
     private int ImageCropEndYPreview { get; set; }
 
-    
+
     private int _imageCropStartX;
 
     public int ImageCropStartX
@@ -131,6 +132,7 @@ public partial class MainWindow : INotifyPropertyChanged
             NotifyPropertyChanged();
         }
     }
+
     private int _imageCropStartY;
 
     public int ImageCropStartY
@@ -145,7 +147,7 @@ public partial class MainWindow : INotifyPropertyChanged
             NotifyPropertyChanged();
         }
     }
-    
+
     private int _imageCropEndX;
 
     public int ImageCropEndX
@@ -160,7 +162,7 @@ public partial class MainWindow : INotifyPropertyChanged
             NotifyPropertyChanged();
         }
     }
-    
+
     private int _imageCropEndY;
 
     public int ImageCropEndY
@@ -188,6 +190,38 @@ public partial class MainWindow : INotifyPropertyChanged
             $"IsUsingDuration: {IsUsingDuration}\n" +
             $"StartPoint: {ImageCropStartX} - {ImageCropStartY} \n" +
             $"EndPoint:{ImageCropEndX} - {ImageCropEndY}");
+    }
+
+    private void BtnGifski_OnClick(object sender, RoutedEventArgs e)
+    {
+        if (!GifskiService.IsGifskiInstalled())
+        {
+            var style = new Style();
+            style.Setters.Add(new Setter(Xceed.Wpf.Toolkit.MessageBox.CancelButtonContentProperty, "Go to website..."));
+            var result = Xceed.Wpf.Toolkit.MessageBox.Show(
+                "Could not find gifski.\n" +
+                "Install it by downloading the latest command-line binaries from https://gif.ski/ " +
+                $"and either add it to your PATH or place it in\n{Directory.GetCurrentDirectory()}\n\n" +
+                "Would you like to try to install gifski automatically?",
+                "Could not find gifski",
+                MessageBoxButton.YesNoCancel,
+                MessageBoxImage.Warning,
+                MessageBoxResult.No,
+                style);
+            // TODO: Complete this
+            if (MessageBoxResult.Yes == result)
+            {
+                // GifskiService.DownloadGifski();
+            }
+            else if (MessageBoxResult.Cancel == result)
+            {
+                // Launch gifski website
+            }
+        }
+        else
+        {
+            MessageBox.Show("Gifski is installed.");
+        }
     }
 
     private void BtnBrowse_Click(object sender, RoutedEventArgs e)
@@ -219,7 +253,7 @@ public partial class MainWindow : INotifyPropertyChanged
     }
 
     #endregion
-    
+
     private void GridImagePreview_OnMouseMove(object sender, MouseEventArgs e)
     {
         var pos = e.GetPosition((Grid) sender);
@@ -241,6 +275,7 @@ public partial class MainWindow : INotifyPropertyChanged
         {
             return;
         }
+
         ImageCropMouseDown = true;
         ImageCropStartX = ImageCropStartXPreview;
         ImageCropStartY = ImageCropStartYPreview;
@@ -252,7 +287,7 @@ public partial class MainWindow : INotifyPropertyChanged
         {
             return;
         }
-        
+
         ImageCropEndX = ImageCropEndXPreview;
         ImageCropEndY = ImageCropEndYPreview;
         ImageCropMouseDown = false;

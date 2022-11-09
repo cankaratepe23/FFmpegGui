@@ -187,7 +187,7 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <Button x:Name="BtnConvert" Click="BtnConvert_Click" Margin="0,0,1,0" Grid.Column="0">Convert</Button>
-                <Button x:Name="BtnGifski" Margin="1,0,0,0" Grid.Column="1">gifski</Button>
+                <Button x:Name="BtnGifski" Click="BtnGifski_OnClick" Margin="1,0,0,0" Grid.Column="1">gifski</Button>
             </Grid>
 
             <!-- TODO -->
