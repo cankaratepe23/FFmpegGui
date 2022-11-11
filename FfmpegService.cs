@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -66,24 +67,39 @@ public class FfmpegService : ConversionToolService
         return true;
     }
 
-    public static async Task<byte[]> GetFrameAtTimestamp(string filePath, string timestamp)
+    public static async Task<byte[]> GetFrameAtTimestampAsync(string filePath, string timestamp)
     {
-        var proc = Process.Start(new ProcessStartInfo
+        var proc = new Process
         {
-            FileName = "ffmpeg.exe",
-            WorkingDirectory = Directory.GetCurrentDirectory(),
-            Arguments = $"-ss {timestamp} -i \"{filePath}\" -c:v bmp -frames:v 1 -f rawvideo -an -sn -",
-            RedirectStandardOutput = true
-        });
-        if (proc == null)
+            StartInfo = new ProcessStartInfo
+            {
+                FileName = "ffmpeg.exe",
+                WorkingDirectory = Directory.GetCurrentDirectory(),
+                Arguments = $"-ss {timestamp} -i \"{filePath}\" -c:v bmp -frames:v 1 -f rawvideo -an -sn -",
+                RedirectStandardOutput = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            }
+        };
+#if DEBUG
+        proc.StartInfo.RedirectStandardError = true;
+#endif
+        proc.Start();
+
+        using var reader = new BinaryReader(proc.StandardOutput.BaseStream);
+        var readValues = new List<byte>();
+        try
         {
-            throw new Exception("Could not start ffmpeg.");
+            while (true)
+            {
+                readValues.Add(reader.ReadByte());
+            }
+        }
+        catch (EndOfStreamException)
+        {
         }
 
-        using var memoryStream = new MemoryStream();
-        var task = proc.StandardOutput.BaseStream.CopyToAsync(memoryStream);
         await proc.WaitForExitAsync();
-        await task;
-        return memoryStream.ToArray();
+        return readValues.ToArray();
     }
 }

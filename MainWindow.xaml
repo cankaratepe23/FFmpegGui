@@ -27,7 +27,8 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Padding="5,2,5,2" Grid.Column="0">File:</TextBlock>
-                <TextBox x:Name="TxtFilePath" Padding="2" Grid.Column="1" MinWidth="100" />
+                <TextBox x:Name="TxtFilePath" Padding="2" Grid.Column="1" MinWidth="100"
+                         LostFocus="TxtFilePath_OnLostFocus" />
                 <Button x:Name="BtnBrowse" Padding="5,2,5,2" Grid.Column="2" Click="BtnBrowse_Click">Browse...</Button>
             </Grid>
 
@@ -39,7 +40,8 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Padding="5,2,5,2" Grid.Column="0">Timestamp:</TextBlock>
-                <TextBox x:Name="TxtTimestamp" Padding="2" Grid.Column="1" MinWidth="100" Text="00:00:00.000" />
+                <TextBox x:Name="TxtTimestamp" Padding="2" Grid.Column="1" MinWidth="100"
+                         Text="{Binding Timestamp, Mode=TwoWay}" LostFocus="TxtTimestamp_OnLostFocus" />
                 <Grid Grid.Column="2">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />

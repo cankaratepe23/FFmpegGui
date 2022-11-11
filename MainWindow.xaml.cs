@@ -8,6 +8,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using Microsoft.Win32;
+using MessageBox = Xceed.Wpf.Toolkit.MessageBox;
 
 namespace FFmpegGui;
 
@@ -28,6 +29,8 @@ public partial class MainWindow : INotifyPropertyChanged
 
     public MainWindow()
     {
+        ImagePreviewSource = FfmpegService.GetFrameAtTimestampAsync("res/sample square.png", "0").GetAwaiter()
+            .GetResult();
         InitializeComponent();
     }
 
@@ -78,10 +81,10 @@ public partial class MainWindow : INotifyPropertyChanged
         IsUsingDuration = !IsUsingDuration;
     }
 
-    private void LoadFile(string inputFilePath)
+    private async void LoadFile()
     {
-        // TODO: After completing ffmpeg service, get actual previews from ffmpeg.
-        MessageBox.Show($"Loaded file: {inputFilePath}");
+        ImagePreviewSource = await Task.Run(() => FfmpegService.GetFrameAtTimestampAsync(FilePath, Timestamp));
+        ;
     }
 
     private async Task<bool> EnsureGifskiInstalled()
@@ -89,8 +92,8 @@ public partial class MainWindow : INotifyPropertyChanged
         if (!await GifskiService.IsToolInstalledAsync())
         {
             var style = new Style();
-            style.Setters.Add(new Setter(Xceed.Wpf.Toolkit.MessageBox.CancelButtonContentProperty, "Go to website..."));
-            var result = Xceed.Wpf.Toolkit.MessageBox.Show(
+            style.Setters.Add(new Setter(MessageBox.CancelButtonContentProperty, "Go to website..."));
+            var result = MessageBox.Show(
                 "Could not find gifski." + Environment.NewLine +
                 "Install it by downloading the latest command-line binaries from https://gif.ski/ " +
                 "and either add it to your PATH and restart this application or place it in"
@@ -123,8 +126,8 @@ public partial class MainWindow : INotifyPropertyChanged
         if (!await FfmpegService.IsToolInstalledAsync())
         {
             var style = new Style();
-            style.Setters.Add(new Setter(Xceed.Wpf.Toolkit.MessageBox.CancelButtonContentProperty, "Go to website..."));
-            var result = Xceed.Wpf.Toolkit.MessageBox.Show(
+            style.Setters.Add(new Setter(MessageBox.CancelButtonContentProperty, "Go to website..."));
+            var result = MessageBox.Show(
                 "Could not find FFmpeg." + Environment.NewLine +
                 "Install it by downloading the latest ffmpeg-git-full.7z from https://www.gyan.dev/ffmpeg/builds/ffmpeg-git-full.7z " +
                 "and either add the ffmpeg.exe file to your PATH and restart this application or place it in"
@@ -284,7 +287,18 @@ public partial class MainWindow : INotifyPropertyChanged
         }
     }
 
-    public byte[] ImagePreviewSource { get; set; }
+    public byte[] ImagePreviewSource
+    {
+        get => _imagePreviewSource;
+        set
+        {
+            _imagePreviewSource = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+    public string FilePath { get; set; }
+    public string Timestamp { get; set; } = "00:00:00.000";
 
     #endregion
 
@@ -292,7 +306,7 @@ public partial class MainWindow : INotifyPropertyChanged
 
     private void BtnConvert_Click(object sender, RoutedEventArgs e)
     {
-        MessageBox.Show(
+        System.Windows.MessageBox.Show(
             $"IsCropEnabled: {IsCropEnabled}" + Environment.NewLine +
             $"IsTrimEnabled: {IsTrimEnabled}" + Environment.NewLine +
             $"IsUsingDuration: {IsUsingDuration}" + Environment.NewLine +
@@ -312,6 +326,9 @@ public partial class MainWindow : INotifyPropertyChanged
         }
     }
 
+    private bool _isFileTextboxEventDisabled;
+    private byte[] _imagePreviewSource;
+
     private void BtnBrowse_Click(object sender, RoutedEventArgs e)
     {
         var openFileDialog = new OpenFileDialog();
@@ -320,11 +337,41 @@ public partial class MainWindow : INotifyPropertyChanged
             return;
         }
 
-        LoadFile(openFileDialog.FileName);
+        _isFileTextboxEventDisabled = true;
+        FilePath = openFileDialog.FileName;
+        LoadFile();
         TxtFilePath.Text = openFileDialog.FileName;
         TxtFilePath.Focus();
         TxtFilePath.CaretIndex = TxtFilePath.Text.Length;
         TxtFilePath.ScrollToEnd();
+        _isFileTextboxEventDisabled = false;
+    }
+
+    private void TxtFilePath_OnLostFocus(object sender, RoutedEventArgs e)
+    {
+        if (_isFileTextboxEventDisabled)
+        {
+            return;
+        }
+
+        if (TxtFilePath.Text == FilePath)
+        {
+            return;
+        }
+
+        FilePath = TxtFilePath.Text;
+        LoadFile();
+    }
+
+    private void TxtTimestamp_OnLostFocus(object sender, RoutedEventArgs e)
+    {
+        if (TxtTimestamp.Text == Timestamp)
+        {
+            return;
+        }
+
+        Timestamp = TxtTimestamp.Text;
+        LoadFile();
     }
 
     private void MenuDurationSwitch_Click(object sender, RoutedEventArgs e)
