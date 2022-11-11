@@ -4,31 +4,29 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Net.Http;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using HtmlAgilityPack;
 
 namespace FFmpegGui;
 
-public class GifskiService
+public class GifskiService : ConversionToolService
 {
-    private static readonly HttpClient Client = new();
+    private static readonly HttpClient Client = new(); // TODO Move this to a global location
 
-    public static async Task<bool> IsGifskiInstalledAsync()
+    private const MainWindow.ConversionTool Tool = MainWindow.ConversionTool.Gifski;
+    
+    public static async Task<bool> IsToolInstalledAsync()
     {
-        try
-        {
-            var process = Process.Start("gifski.exe");
-            await process.WaitForExitAsync();
-        }
-        catch (Exception)
-        {
-            return false;
-        }
-
-        return true;
+        return await IsToolInstalledAsync(Tool);
     }
-
+    
+    public static void LaunchWebsite()
+    {
+        LaunchWebsite(Tool);
+    }
+    
     public static async Task InstallGifskiAsync()
     {
         Util.LogToUser("Loading https://gif.ski/ ...");
@@ -77,15 +75,5 @@ public class GifskiService
         Util.LogToUser($"Deleting the zip file {filename}");
         File.Delete(filename);
         Util.LogToUser("Done!");
-    }
-
-    public static void LaunchWebsite()
-    {
-        var process = Process.Start(
-            new ProcessStartInfo
-            {
-                FileName = "https://gif.ski/",
-                UseShellExecute = true
-            });
     }
 }

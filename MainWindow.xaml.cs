@@ -15,6 +15,12 @@ namespace FFmpegGui;
 /// </summary>
 public partial class MainWindow : INotifyPropertyChanged
 {
+    public enum ConversionTool
+    {
+        Ffmpeg,
+        Gifski
+    }
+    
     private static string _userLogText = "";
 
     public MainWindow()
@@ -71,7 +77,13 @@ public partial class MainWindow : INotifyPropertyChanged
 
     private void LoadFile(string inputFilePath)
     {
+        // TODO: After completing ffmpeg service, get actual previews from ffmpeg.
         MessageBox.Show($"Loaded file: {inputFilePath}");
+    }
+
+    private void EnsureToolInstalled()
+    {
+        throw new NotImplementedException();
     }
 
     #region Properties
@@ -222,7 +234,7 @@ public partial class MainWindow : INotifyPropertyChanged
 
     private async void BtnGifski_OnClick(object sender, RoutedEventArgs e)
     {
-        if (!await GifskiService.IsGifskiInstalledAsync())
+        if (!await GifskiService.IsToolInstalledAsync())
         {
             var style = new Style();
             style.Setters.Add(new Setter(Xceed.Wpf.Toolkit.MessageBox.CancelButtonContentProperty, "Go to website..."));
