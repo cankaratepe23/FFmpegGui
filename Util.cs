@@ -18,13 +18,13 @@ public static class Util
             _ => throw new ArgumentOutOfRangeException(nameof(tool), tool, "Invalid tool.")
         };
     }
-    
+
     public static string ToWebsite(this MainWindow.ConversionTool tool)
     {
         return tool switch
         {
             MainWindow.ConversionTool.Gifski => "https://gif.ski",
-            MainWindow.ConversionTool.Ffmpeg => "https://ffmpeg.org/",
+            MainWindow.ConversionTool.Ffmpeg => "https://www.gyan.dev/ffmpeg/builds/",
             _ => throw new ArgumentOutOfRangeException(nameof(tool), tool, "Invalid tool.")
         };
     }

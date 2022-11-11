@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.IO;
+using System.Net.Http;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
@@ -20,8 +21,10 @@ public partial class MainWindow : INotifyPropertyChanged
         Ffmpeg,
         Gifski
     }
-    
+
     private static string _userLogText = "";
+
+    public static readonly HttpClient Client = new();
 
     public MainWindow()
     {
@@ -81,9 +84,72 @@ public partial class MainWindow : INotifyPropertyChanged
         MessageBox.Show($"Loaded file: {inputFilePath}");
     }
 
-    private void EnsureToolInstalled()
+    private async Task<bool> EnsureGifskiInstalled()
     {
-        throw new NotImplementedException();
+        if (!await GifskiService.IsToolInstalledAsync())
+        {
+            var style = new Style();
+            style.Setters.Add(new Setter(Xceed.Wpf.Toolkit.MessageBox.CancelButtonContentProperty, "Go to website..."));
+            var result = Xceed.Wpf.Toolkit.MessageBox.Show(
+                "Could not find gifski." + Environment.NewLine +
+                "Install it by downloading the latest command-line binaries from https://gif.ski/ " +
+                "and either add it to your PATH and restart this application or place it in"
+                + Environment.NewLine + Directory.GetCurrentDirectory()
+                + Environment.NewLine + Environment.NewLine +
+                "Would you like to try to install gifski automatically?",
+                "Could not find gifski",
+                MessageBoxButton.YesNoCancel,
+                MessageBoxImage.Warning,
+                MessageBoxResult.No,
+                style);
+            if (MessageBoxResult.Yes == result)
+            {
+                return await Task.Run(GifskiService.InstallGifskiAsync);
+            }
+
+            if (MessageBoxResult.Cancel == result)
+            {
+                await Task.Run(GifskiService.LaunchWebsite);
+            }
+
+            return false;
+        }
+
+        return true;
+    }
+
+    private async Task<bool> EnsureFfmpegInstalled()
+    {
+        if (!await FfmpegService.IsToolInstalledAsync())
+        {
+            var style = new Style();
+            style.Setters.Add(new Setter(Xceed.Wpf.Toolkit.MessageBox.CancelButtonContentProperty, "Go to website..."));
+            var result = Xceed.Wpf.Toolkit.MessageBox.Show(
+                "Could not find FFmpeg." + Environment.NewLine +
+                "Install it by downloading the latest ffmpeg-git-full.7z from https://www.gyan.dev/ffmpeg/builds/ffmpeg-git-full.7z " +
+                "and either add the ffmpeg.exe file to your PATH and restart this application or place it in"
+                + Environment.NewLine + Directory.GetCurrentDirectory()
+                + Environment.NewLine + Environment.NewLine +
+                "Would you like to try to install FFmpeg automatically?",
+                "Could not find FFmpeg",
+                MessageBoxButton.YesNoCancel,
+                MessageBoxImage.Warning,
+                MessageBoxResult.No,
+                style);
+            if (MessageBoxResult.Yes == result)
+            {
+                return await Task.Run(FfmpegService.InstallFfmpegAsync);
+            }
+
+            if (MessageBoxResult.Cancel == result)
+            {
+                await Task.Run(FfmpegService.LaunchWebsite);
+            }
+
+            return false;
+        }
+
+        return true;
     }
 
     #region Properties
@@ -218,6 +284,8 @@ public partial class MainWindow : INotifyPropertyChanged
         }
     }
 
+    public byte[] ImagePreviewSource { get; set; }
+
     #endregion
 
     #region Events
@@ -234,34 +302,13 @@ public partial class MainWindow : INotifyPropertyChanged
 
     private async void BtnGifski_OnClick(object sender, RoutedEventArgs e)
     {
-        if (!await GifskiService.IsToolInstalledAsync())
+        if (await EnsureGifskiInstalled() && await EnsureFfmpegInstalled())
         {
-            var style = new Style();
-            style.Setters.Add(new Setter(Xceed.Wpf.Toolkit.MessageBox.CancelButtonContentProperty, "Go to website..."));
-            var result = Xceed.Wpf.Toolkit.MessageBox.Show(
-                "Could not find gifski." + Environment.NewLine +
-                "Install it by downloading the latest command-line binaries from https://gif.ski/ " +
-                "and either add it to your PATH and restart this application or place it in"
-                + Environment.NewLine + Directory.GetCurrentDirectory()
-                + Environment.NewLine + Environment.NewLine +
-                "Would you like to try to install gifski automatically?",
-                caption: "Could not find gifski",
-                button: MessageBoxButton.YesNoCancel,
-                icon: MessageBoxImage.Warning,
-                defaultResult: MessageBoxResult.No,
-                messageBoxStyle: style);
-            if (MessageBoxResult.Yes == result)
-            {
-                await Task.Run(GifskiService.InstallGifskiAsync);
-            }
-            else if (MessageBoxResult.Cancel == result)
-            {
-                await Task.Run(GifskiService.LaunchWebsite);
-            }
+            // TODO: Run ffmpeg to get frames and gifski to convert to gif
         }
         else
         {
-            MessageBox.Show("Gifski is installed.");
+            Util.LogToUser("You need FFmpeg and gifski installed to use gifski.");
         }
     }
 
@@ -331,6 +378,6 @@ public partial class MainWindow : INotifyPropertyChanged
         ImageCropEndY = ImageCropEndYPreview;
         ImageCropMouseDown = false;
     }
-    
+
     #endregion
 }

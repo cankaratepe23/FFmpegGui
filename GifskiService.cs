@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Net.Http;
-using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using HtmlAgilityPack;
@@ -13,21 +10,19 @@ namespace FFmpegGui;
 
 public class GifskiService : ConversionToolService
 {
-    private static readonly HttpClient Client = new(); // TODO Move this to a global location
-
     private const MainWindow.ConversionTool Tool = MainWindow.ConversionTool.Gifski;
-    
+
     public static async Task<bool> IsToolInstalledAsync()
     {
         return await IsToolInstalledAsync(Tool);
     }
-    
+
     public static void LaunchWebsite()
     {
         LaunchWebsite(Tool);
     }
-    
-    public static async Task InstallGifskiAsync()
+
+    public static async Task<bool> InstallGifskiAsync()
     {
         Util.LogToUser("Loading https://gif.ski/ ...");
         var gifskiPage = new HtmlWeb();
@@ -37,8 +32,9 @@ public class GifskiService : ConversionToolService
                 n.GetAttributeValue("href", string.Empty), @"^\/gifski-.*\.zip$"));
         if (href == null)
         {
-            Util.LogToUser("Could not find the download link inside the web page. You need to install gifski manually.");
-            return;
+            Util.LogToUser(
+                "Could not find the download link inside the web page. You need to install gifski manually.");
+            return false;
         }
 
         Util.LogToUser("Downloading gifski...");
@@ -46,7 +42,7 @@ public class GifskiService : ConversionToolService
         var filename = downloadLink[(downloadLink.LastIndexOf('/') + 1)..];
         try
         {
-            await using var downloadStream = await Client.GetStreamAsync(downloadLink);
+            await using var downloadStream = await MainWindow.Client.GetStreamAsync(downloadLink);
             await using var fileStream = new FileStream(filename, FileMode.Create);
             await downloadStream.CopyToAsync(fileStream);
         }
@@ -54,7 +50,7 @@ public class GifskiService : ConversionToolService
         {
             Util.LogToUser($"An error occurred while downloading {filename}.");
             Util.LogToUser($"Exception details: {e.Message}");
-            return;
+            return false;
         }
 
         Util.LogToUser("Extracting...");
@@ -69,11 +65,12 @@ public class GifskiService : ConversionToolService
         {
             Util.LogToUser($"An error occurred while extracting {filename}.");
             Util.LogToUser($"Exception details: {e.Message}");
-            return;
+            return false;
         }
 
         Util.LogToUser($"Deleting the zip file {filename}");
         File.Delete(filename);
         Util.LogToUser("Done!");
+        return true;
     }
 }
