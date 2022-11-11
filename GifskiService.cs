@@ -14,11 +14,6 @@ public class GifskiService
 {
     private static readonly HttpClient Client = new();
 
-    private static void LogToUser(string message)
-    {
-        MainWindow.UserLogText = message + Environment.NewLine + MainWindow.UserLogText;
-    }
-
     public static async Task<bool> IsGifskiInstalledAsync()
     {
         try
@@ -36,7 +31,7 @@ public class GifskiService
 
     public static async Task InstallGifskiAsync()
     {
-        LogToUser("Loading https://gif.ski/ ...");
+        Util.LogToUser("Loading https://gif.ski/ ...");
         var gifskiPage = new HtmlWeb();
         var gifskiPageDoc = await gifskiPage.LoadFromWebAsync("https://gif.ski/");
         var href = gifskiPageDoc.DocumentNode.SelectNodes("//a[@href]")
@@ -44,11 +39,11 @@ public class GifskiService
                 n.GetAttributeValue("href", string.Empty), @"^\/gifski-.*\.zip$"));
         if (href == null)
         {
-            LogToUser("Could not find the download link inside the web page. You need to install gifski manually.");
+            Util.LogToUser("Could not find the download link inside the web page. You need to install gifski manually.");
             return;
         }
 
-        LogToUser("Downloading gifski...");
+        Util.LogToUser("Downloading gifski...");
         var downloadLink = "https://gif.ski" + href.GetAttributeValue("href", string.Empty);
         var filename = downloadLink[(downloadLink.LastIndexOf('/') + 1)..];
         try
@@ -59,12 +54,12 @@ public class GifskiService
         }
         catch (Exception e)
         {
-            LogToUser($"An error occurred while downloading {filename}.");
-            LogToUser($"Exception details: {e.Message}");
+            Util.LogToUser($"An error occurred while downloading {filename}.");
+            Util.LogToUser($"Exception details: {e.Message}");
             return;
         }
 
-        LogToUser("Extracting...");
+        Util.LogToUser("Extracting...");
         try
         {
             using var archive = ZipFile.OpenRead(filename);
@@ -74,14 +69,14 @@ public class GifskiService
         }
         catch (Exception e)
         {
-            LogToUser($"An error occurred while extracting {filename}.");
-            LogToUser($"Exception details: {e.Message}");
+            Util.LogToUser($"An error occurred while extracting {filename}.");
+            Util.LogToUser($"Exception details: {e.Message}");
             return;
         }
 
-        LogToUser($"Deleting the zip file {filename}");
+        Util.LogToUser($"Deleting the zip file {filename}");
         File.Delete(filename);
-        LogToUser("Done!");
+        Util.LogToUser("Done!");
     }
 
     public static void LaunchWebsite()
