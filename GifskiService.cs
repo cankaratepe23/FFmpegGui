@@ -83,4 +83,14 @@ public class GifskiService
         File.Delete(filename);
         LogToUser("Done!");
     }
+
+    public static void LaunchWebsite()
+    {
+        var process = Process.Start(
+            new ProcessStartInfo
+            {
+                FileName = "https://gif.ski/",
+                UseShellExecute = true
+            });
+    }
 }

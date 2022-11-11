@@ -229,23 +229,22 @@ public partial class MainWindow : INotifyPropertyChanged
             var result = Xceed.Wpf.Toolkit.MessageBox.Show(
                 "Could not find gifski." + Environment.NewLine +
                 "Install it by downloading the latest command-line binaries from https://gif.ski/ " +
-                "and either add it to your PATH or place it in"
+                "and either add it to your PATH and restart this application or place it in"
                 + Environment.NewLine + Directory.GetCurrentDirectory()
                 + Environment.NewLine + Environment.NewLine +
                 "Would you like to try to install gifski automatically?",
-                "Could not find gifski",
-                MessageBoxButton.YesNoCancel,
-                MessageBoxImage.Warning,
-                MessageBoxResult.No,
-                style);
-            // TODO: Complete this
+                caption: "Could not find gifski",
+                button: MessageBoxButton.YesNoCancel,
+                icon: MessageBoxImage.Warning,
+                defaultResult: MessageBoxResult.No,
+                messageBoxStyle: style);
             if (MessageBoxResult.Yes == result)
             {
                 await Task.Run(GifskiService.InstallGifskiAsync);
             }
             else if (MessageBoxResult.Cancel == result)
             {
-                // Launch gifski website
+                await Task.Run(GifskiService.LaunchWebsite);
             }
         }
         else
