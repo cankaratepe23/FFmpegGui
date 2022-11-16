@@ -102,8 +102,21 @@ public partial class MainWindow : INotifyPropertyChanged
         LoadFrame();
     }
 
+    private void CalculateNewTimestamp(TimeSpan delta)
+    {
+        var succeeded = TimeSpan.TryParse(Timestamp, out var timeSpan);
+        Timestamp = (timeSpan + delta).ToString(@"hh\:mm\:ss\.fff");
+        LoadFrame();
+    }
+
     private async void LoadFile()
     {
+        if (!File.Exists(FilePath))
+        {
+            TxtFilePath.Foreground = new SolidColorBrush(Colors.Red);
+            return;
+        }
+        TxtFilePath.Foreground = new SolidColorBrush(Colors.Black);
         var metadata = await FfmpegService.GetVideoMetadata(FilePath);
         CurrentFps = metadata.Fps;
         LoadFrame();
@@ -111,6 +124,11 @@ public partial class MainWindow : INotifyPropertyChanged
     
     private async void LoadFrame()
     {
+        if (!File.Exists(FilePath))
+        {
+            TxtFilePath.Foreground = new SolidColorBrush(Colors.Red);
+            return;
+        }
         ImagePreviewSource = await Task.Run(() => FfmpegService.GetFrameAtTimestampAsync(FilePath, Timestamp));
     }
 
@@ -325,7 +343,7 @@ public partial class MainWindow : INotifyPropertyChanged
     }
 
     public string FilePath { get; set; }
-    public string Timestamp { get; set; } = "00:00:00.000";
+    public string Timestamp { get; set; } = "00:00:00.000"; // TODO Maybe use a TimeSpan instead of string?
 
     public double CurrentFps { get; set; }
 
@@ -401,6 +419,26 @@ public partial class MainWindow : INotifyPropertyChanged
     private void TxtTimestamp_OnTextChanged(object sender, TextChangedEventArgs e)
     {
         HandleTimestampChanged();
+    }
+    
+    private void BtnRewindFast_OnClick(object sender, RoutedEventArgs e)
+    {
+        CalculateNewTimestamp(TimeSpan.FromSeconds(-1));
+    }
+
+    private void BtnRewind_OnClick(object sender, RoutedEventArgs e)
+    {
+        throw new NotImplementedException();
+    }
+
+    private void BtnForward_OnClick(object sender, RoutedEventArgs e)
+    {
+        throw new NotImplementedException();
+    }
+
+    private void BtnForwardFast_OnClick(object sender, RoutedEventArgs e)
+    {
+        CalculateNewTimestamp(TimeSpan.FromSeconds(1));
     }
 
     private void MenuDurationSwitch_Click(object sender, RoutedEventArgs e)

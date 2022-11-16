@@ -49,10 +49,10 @@
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
-                    <Button x:Name="BtnRewindFast" Padding="5,2,5,2" Grid.Column="0" Content="&lt;&lt;" />
-                    <Button x:Name="BtnRewind" Padding="5,2,5,2" Grid.Column="1" Content="&lt;" />
-                    <Button x:Name="BtnForward" Padding="5,2,5,2" Grid.Column="2" Content="&gt;" />
-                    <Button x:Name="BtnForwardFast" Padding="5,2,5,2" Grid.Column="3" Content="&gt;&gt;" />
+                    <Button x:Name="BtnRewindFast" Padding="5,2,5,2" Grid.Column="0" Content="&lt;&lt;" Click="BtnRewindFast_OnClick"/>
+                    <Button x:Name="BtnRewind" Padding="5,2,5,2" Grid.Column="1" Content="&lt;" Click="BtnRewind_OnClick" />
+                    <Button x:Name="BtnForward" Padding="5,2,5,2" Grid.Column="2" Content="&gt;" Click="BtnForward_OnClick"/>
+                    <Button x:Name="BtnForwardFast" Padding="5,2,5,2" Grid.Column="3" Content="&gt;&gt;" Click="BtnForwardFast_OnClick" />
                 </Grid>
             </Grid>
 
