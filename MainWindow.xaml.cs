@@ -343,7 +343,20 @@ public partial class MainWindow : INotifyPropertyChanged
     }
 
     public string FilePath { get; set; }
-    public string Timestamp { get; set; } = "00:00:00.000"; // TODO Maybe use a TimeSpan instead of string?
+
+    public string Timestamp
+    {
+        get => _timestamp;
+        set {
+            if (_timestamp == value)
+            {
+                return;
+            }
+
+            _timestamp = value;
+            NotifyPropertyChanged();
+        }
+    } // TODO Maybe use a TimeSpan instead of string?
 
     public double CurrentFps { get; set; }
 
@@ -375,6 +388,7 @@ public partial class MainWindow : INotifyPropertyChanged
 
     private bool _isFileTextboxEventDisabled;
     private byte[] _imagePreviewSource;
+    private string _timestamp = "00:00:00.000";
 
     private void BtnBrowse_Click(object sender, RoutedEventArgs e)
     {
