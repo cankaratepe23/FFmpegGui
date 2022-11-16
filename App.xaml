@@ -10,5 +10,6 @@
         <local:CustomBooleanToVisibilityConverter x:Key="InvertedBooleanToVisibilityConverter"
                                                   True="Collapsed"
                                                   False="Visible" />
+        <local:TimeSpanStringConverter x:Key="TimeSpanStringConverter" />
     </Application.Resources>
 </Application>

@@ -26,6 +26,10 @@ public partial class MainWindow : INotifyPropertyChanged
     }
 
     private static string _userLogText = "";
+    
+    public const string TimestampToStringFormat = @"hh\:mm\:ss\.fff";
+
+    public static readonly string[] TimestampFormats = { TimestampToStringFormat };
 
     public static readonly HttpClient Client = new();
 
@@ -83,30 +87,9 @@ public partial class MainWindow : INotifyPropertyChanged
         IsUsingDuration = !IsUsingDuration;
     }
 
-    private void HandleTimestampChanged()
-    {
-        if (TxtTimestamp.Text == Timestamp)
-        {
-            return;
-        }
-
-        if (!Regex.IsMatch(TxtTimestamp.Text, "^([0-9]{1,2}:){0,2}([0-9]{1,2})(.([0-9]{1,3})){0,1}$"))
-        {
-            TxtTimestamp.Foreground = new SolidColorBrush(Colors.Red);
-            return;
-        }
-
-        TxtTimestamp.Foreground = new SolidColorBrush(Colors.Black);
-
-        Timestamp = TxtTimestamp.Text;
-        LoadFrame();
-    }
-
     private void CalculateNewTimestamp(TimeSpan delta)
     {
-        var succeeded = TimeSpan.TryParse(Timestamp, out var timeSpan);
-        Timestamp = (timeSpan + delta).ToString(@"hh\:mm\:ss\.fff");
-        LoadFrame();
+        Timestamp += delta;
     }
 
     private async void LoadFile()
@@ -129,7 +112,7 @@ public partial class MainWindow : INotifyPropertyChanged
             TxtFilePath.Foreground = new SolidColorBrush(Colors.Red);
             return;
         }
-        ImagePreviewSource = await Task.Run(() => FfmpegService.GetFrameAtTimestampAsync(FilePath, Timestamp));
+        ImagePreviewSource = await Task.Run(() => FfmpegService.GetFrameAtTimestampAsync(FilePath, Timestamp.ToDefaultTimestampString()));
     }
 
     private async Task<bool> EnsureGifskiInstalled()
@@ -331,7 +314,7 @@ public partial class MainWindow : INotifyPropertyChanged
             NotifyPropertyChanged();
         }
     }
-
+    private byte[] _imagePreviewSource;
     public byte[] ImagePreviewSource
     {
         get => _imagePreviewSource;
@@ -343,8 +326,10 @@ public partial class MainWindow : INotifyPropertyChanged
     }
 
     public string FilePath { get; set; }
+    
+    private TimeSpan _timestamp;
 
-    public string Timestamp
+    public TimeSpan Timestamp
     {
         get => _timestamp;
         set {
@@ -354,9 +339,10 @@ public partial class MainWindow : INotifyPropertyChanged
             }
 
             _timestamp = value;
+            LoadFrame();
             NotifyPropertyChanged();
         }
-    } // TODO Maybe use a TimeSpan instead of string?
+    }
 
     public double CurrentFps { get; set; }
 
@@ -387,8 +373,6 @@ public partial class MainWindow : INotifyPropertyChanged
     }
 
     private bool _isFileTextboxEventDisabled;
-    private byte[] _imagePreviewSource;
-    private string _timestamp = "00:00:00.000";
 
     private void BtnBrowse_Click(object sender, RoutedEventArgs e)
     {
@@ -424,17 +408,6 @@ public partial class MainWindow : INotifyPropertyChanged
         LoadFile();
     }
 
-    private void TxtTimestamp_OnLostFocus(object sender, RoutedEventArgs e)
-    {
-        HandleTimestampChanged();
-    }
-
-
-    private void TxtTimestamp_OnTextChanged(object sender, TextChangedEventArgs e)
-    {
-        HandleTimestampChanged();
-    }
-    
     private void BtnRewindFast_OnClick(object sender, RoutedEventArgs e)
     {
         CalculateNewTimestamp(TimeSpan.FromSeconds(-1));

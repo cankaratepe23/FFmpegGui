@@ -40,8 +40,15 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Padding="5,2,5,2" Grid.Column="0">Timestamp:</TextBlock>
-                <TextBox x:Name="TxtTimestamp" Padding="2" Grid.Column="1" MinWidth="100"
-                         Text="{Binding Timestamp, Mode=TwoWay}" TextChanged="TxtTimestamp_OnTextChanged" LostFocus="TxtTimestamp_OnLostFocus" />
+                <TextBox x:Name="TxtTimestamp" Padding="2" Grid.Column="1" MinWidth="100">
+                    <TextBox.Text>
+                        <Binding Path="Timestamp" Mode="TwoWay" Converter="{StaticResource TimeSpanStringConverter}">
+                            <Binding.ValidationRules>
+                                <local:TimestampValidationRule/>
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
                 <Grid Grid.Column="2">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />

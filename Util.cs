@@ -28,4 +28,9 @@ public static class Util
             _ => throw new ArgumentOutOfRangeException(nameof(tool), tool, "Invalid tool.")
         };
     }
+
+    public static string ToDefaultTimestampString(this TimeSpan timeSpan)
+    {
+        return timeSpan.ToString(MainWindow.TimestampToStringFormat);
+    }
 }
