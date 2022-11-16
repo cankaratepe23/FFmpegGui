@@ -89,6 +89,8 @@ public partial class MainWindow : INotifyPropertyChanged
 
     private void CalculateNewTimestamp(TimeSpan delta)
     {
+        // TODO: Do not allow negative timespans
+        // TODO: Do not allow timespans longer than video length
         Timestamp += delta;
     }
 
