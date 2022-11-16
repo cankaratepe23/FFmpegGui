@@ -3,10 +3,12 @@ using System.ComponentModel;
 using System.IO;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using Microsoft.Win32;
 using MessageBox = Xceed.Wpf.Toolkit.MessageBox;
 
@@ -81,10 +83,28 @@ public partial class MainWindow : INotifyPropertyChanged
         IsUsingDuration = !IsUsingDuration;
     }
 
+    private void HandleTimestampChanged()
+    {
+        if (TxtTimestamp.Text == Timestamp)
+        {
+            return;
+        }
+
+        if (!Regex.IsMatch(TxtTimestamp.Text, "^([0-9]{1,2}:){0,2}([0-9]{1,2})(.([0-9]{1,3})){0,1}$"))
+        {
+            TxtTimestamp.Foreground = new SolidColorBrush(Colors.Red);
+            return;
+        }
+
+        TxtTimestamp.Foreground = new SolidColorBrush(Colors.Black);
+
+        Timestamp = TxtTimestamp.Text;
+        LoadFile();
+    }
+
     private async void LoadFile()
     {
         ImagePreviewSource = await Task.Run(() => FfmpegService.GetFrameAtTimestampAsync(FilePath, Timestamp));
-        ;
     }
 
     private async Task<bool> EnsureGifskiInstalled()
@@ -365,13 +385,13 @@ public partial class MainWindow : INotifyPropertyChanged
 
     private void TxtTimestamp_OnLostFocus(object sender, RoutedEventArgs e)
     {
-        if (TxtTimestamp.Text == Timestamp)
-        {
-            return;
-        }
+        HandleTimestampChanged();
+    }
 
-        Timestamp = TxtTimestamp.Text;
-        LoadFile();
+
+    private void TxtTimestamp_OnTextChanged(object sender, TextChangedEventArgs e)
+    {
+        HandleTimestampChanged();
     }
 
     private void MenuDurationSwitch_Click(object sender, RoutedEventArgs e)

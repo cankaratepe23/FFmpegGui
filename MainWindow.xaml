@@ -41,7 +41,7 @@
                 </Grid.ColumnDefinitions>
                 <TextBlock Padding="5,2,5,2" Grid.Column="0">Timestamp:</TextBlock>
                 <TextBox x:Name="TxtTimestamp" Padding="2" Grid.Column="1" MinWidth="100"
-                         Text="{Binding Timestamp, Mode=TwoWay}" LostFocus="TxtTimestamp_OnLostFocus" />
+                         Text="{Binding Timestamp, Mode=TwoWay}" TextChanged="TxtTimestamp_OnTextChanged" LostFocus="TxtTimestamp_OnLostFocus" />
                 <Grid Grid.Column="2">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
