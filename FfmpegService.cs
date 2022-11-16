@@ -51,8 +51,15 @@ public class FfmpegService : ConversionToolService
             {
                 throw new Exception("Could not find the ffmpeg.exe file inside the downloaded zip.");
             }
-
             ffmpegExe.Extract(Tool.ToExeName());
+
+            var ffprobeExe = archive.Entries.FirstOrDefault(e =>
+                Regex.IsMatch(e.FileName, @"ffprobe\.exe$"));
+            if (ffprobeExe == null)
+            {
+                throw new Exception("Could not find the ffprobe.exe file inside the downloaded zip.");
+            }
+            ffprobeExe.Extract("ffprobe.exe");
         }
         catch (Exception e)
         {
@@ -67,6 +74,43 @@ public class FfmpegService : ConversionToolService
         return true;
     }
 
+    public static async Task<VideoMetadata> GetVideoMetadata(string filePath)
+    {
+        var proc = new Process
+        {
+            StartInfo = new ProcessStartInfo
+            {
+                FileName = "ffprobe.exe",
+                WorkingDirectory = Directory.GetCurrentDirectory(),
+                Arguments = $"-v 0 -of csv=p=0 -select_streams v:0 -show_entries stream=r_frame_rate -i \"{filePath}\"",
+                RedirectStandardOutput = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            }
+        };
+#if DEBUG
+        proc.StartInfo.RedirectStandardError = true;
+#endif
+        proc.Start();
+
+        var returnValue = await proc.StandardOutput.ReadToEndAsync();
+        returnValue = returnValue.Trim();
+        await proc.WaitForExitAsync();
+        
+        if (string.IsNullOrWhiteSpace(returnValue) || !Regex.IsMatch(returnValue, "^[0-9]*/[0-9]*$") || returnValue == "0/0")
+        {
+            throw new Exception("Video has wrong/invalid FPS.");
+        }
+
+        var numbers = Regex.Matches(returnValue, "[0-9]+");
+        var fps = Convert.ToDouble(numbers[0].Value) / Convert.ToDouble(numbers[1].Value);
+
+        return new VideoMetadata()
+        {
+            Fps = fps
+        };
+    }
+    
     public static async Task<byte[]> GetFrameAtTimestampAsync(string filePath, string timestamp)
     {
         var proc = new Process

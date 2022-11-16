@@ -99,10 +99,17 @@ public partial class MainWindow : INotifyPropertyChanged
         TxtTimestamp.Foreground = new SolidColorBrush(Colors.Black);
 
         Timestamp = TxtTimestamp.Text;
-        LoadFile();
+        LoadFrame();
     }
 
     private async void LoadFile()
+    {
+        var metadata = await FfmpegService.GetVideoMetadata(FilePath);
+        CurrentFps = metadata.Fps;
+        LoadFrame();
+    }
+    
+    private async void LoadFrame()
     {
         ImagePreviewSource = await Task.Run(() => FfmpegService.GetFrameAtTimestampAsync(FilePath, Timestamp));
     }
@@ -319,6 +326,8 @@ public partial class MainWindow : INotifyPropertyChanged
 
     public string FilePath { get; set; }
     public string Timestamp { get; set; } = "00:00:00.000";
+
+    public double CurrentFps { get; set; }
 
     #endregion
 
