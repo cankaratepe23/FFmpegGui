@@ -51,6 +51,7 @@ public class FfmpegService : ConversionToolService
             {
                 throw new Exception("Could not find the ffmpeg.exe file inside the downloaded zip.");
             }
+
             ffmpegExe.Extract(Tool.ToExeName());
 
             var ffprobeExe = archive.Entries.FirstOrDefault(e =>
@@ -59,6 +60,7 @@ public class FfmpegService : ConversionToolService
             {
                 throw new Exception("Could not find the ffprobe.exe file inside the downloaded zip.");
             }
+
             ffprobeExe.Extract("ffprobe.exe");
         }
         catch (Exception e)
@@ -96,8 +98,9 @@ public class FfmpegService : ConversionToolService
         var returnValue = await proc.StandardOutput.ReadToEndAsync();
         returnValue = returnValue.Trim();
         await proc.WaitForExitAsync();
-        
-        if (string.IsNullOrWhiteSpace(returnValue) || !Regex.IsMatch(returnValue, "^[0-9]*/[0-9]*$") || returnValue == "0/0")
+
+        if (string.IsNullOrWhiteSpace(returnValue) || !Regex.IsMatch(returnValue, "^[0-9]*/[0-9]*$") ||
+            returnValue == "0/0")
         {
             throw new Exception("Video has wrong/invalid FPS.");
         }
@@ -110,7 +113,7 @@ public class FfmpegService : ConversionToolService
             Fps = fps
         };
     }
-    
+
     public static async Task<byte[]> GetFrameAtTimestampAsync(string filePath, string timestamp)
     {
         var proc = new Process
@@ -145,5 +148,35 @@ public class FfmpegService : ConversionToolService
 
         await proc.WaitForExitAsync();
         return readValues.ToArray();
+    }
+
+    public static async Task<string> GetFramesAsync(string filePath)
+    {
+        var outputDir = Util.GetTemporaryDirectory();
+        while (File.Exists(outputDir))
+        {
+            outputDir = Util.GetTemporaryDirectory();
+        }
+
+        var proc = new Process
+        {
+            StartInfo = new ProcessStartInfo
+            {
+                FileName = "ffmpeg.exe",
+                WorkingDirectory = outputDir,
+                Arguments = $"-i \"{filePath}\" frame%03d.png",
+                UseShellExecute = false,
+                CreateNoWindow = true
+            }
+        };
+        
+#if DEBUG
+        proc.StartInfo.RedirectStandardError = true;
+#endif
+        proc.Start();
+
+        await proc.WaitForExitAsync();
+        Util.LogToUser("Exported video frames");
+        return outputDir;
     }
 }

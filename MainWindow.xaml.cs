@@ -367,6 +367,7 @@ public partial class MainWindow : INotifyPropertyChanged
         if (await EnsureGifskiInstalled() && await EnsureFfmpegInstalled())
         {
             // TODO: Run ffmpeg to get frames and gifski to convert to gif
+            var framesDir = await FfmpegService.GetFramesAsync(FilePath);
         }
         else
         {
