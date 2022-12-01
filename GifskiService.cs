@@ -77,13 +77,31 @@ public class GifskiService : ConversionToolService
 
     public static async Task<string> ConvertToGif(string framesDir, int fps, int quality, int width)
     {
+        var args = "-o output.gif ";
+        if (fps > 0)
+        {
+            args += $"--fps {fps} ";
+        }
+
+        if (quality > 0)
+        {
+            if (quality > 100)
+                quality = 100;
+            args += $"--quality {quality} ";
+        }
+
+        if (width > 0)
+        {
+            args += $"--width {width} ";
+        }
+        args += "frame*.png";
         var proc = new Process
         {
             StartInfo = new ProcessStartInfo
             {
                 FileName = "gifski.exe",
                 WorkingDirectory = framesDir,
-                Arguments = $"-o output.gif frame*.png",
+                Arguments = args,
                 UseShellExecute = false,
                 CreateNoWindow = true
             }

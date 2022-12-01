@@ -373,10 +373,14 @@ public partial class MainWindow : INotifyPropertyChanged
 
     private async void BtnGifski_OnClick(object sender, RoutedEventArgs e)
     {
+        if (string.IsNullOrWhiteSpace(FilePath) || !File.Exists(FilePath))
+        {
+            return;
+        }
+        
         if (await EnsureGifskiInstalled() && await EnsureFfmpegInstalled())
         {
-            // TODO: Refactor these GET methods into private methods for "run FFmpeg/gifski with given argument"
-            // TODO: Handle 0 (or negative or whatever) values for empty textboxes in Service methods
+            //TODO Log ffmpeg/gifski errors if possible
             var framesDir = await FfmpegService.GetFramesAsync(FilePath, FfmpegFps);
             var gifPath = await GifskiService.ConvertToGif(framesDir, GifskiFps, GifskiQuality, GifskiWidth);
             File.Copy(gifPath, Path.GetFileNameWithoutExtension(FilePath) + ".gif", false);

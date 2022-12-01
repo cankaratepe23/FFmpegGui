@@ -152,6 +152,12 @@ public class FfmpegService : ConversionToolService
 
     public static async Task<string> GetFramesAsync(string filePath, int fps)
     {
+        var args = $"-i \"{filePath}\" ";
+        if (fps > 0)
+        {
+            args += $"-r {fps} ";
+        }
+        args += "frame%03d.png";
         var outputDir = Util.GetTemporaryDirectory();
         while (File.Exists(outputDir))
         {
@@ -164,7 +170,7 @@ public class FfmpegService : ConversionToolService
             {
                 FileName = "ffmpeg.exe",
                 WorkingDirectory = outputDir,
-                Arguments = $"-i \"{filePath}\" frame%03d.png",
+                Arguments = args,
                 UseShellExecute = false,
                 CreateNoWindow = true
             }
