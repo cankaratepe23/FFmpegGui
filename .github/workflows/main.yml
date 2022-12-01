@@ -1,12 +1,9 @@
 ---
 name: Publish
 on:
-  workflow_dispatch:
-    inputs:
-      logLevel:
-        description: Enter a version prefix for this release
-        required: true
-        type: string
+  push:
+    branches: [ master ]
+
 jobs:
   deploy:
     runs-on: windows-latest
