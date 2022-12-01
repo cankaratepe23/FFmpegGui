@@ -3,10 +3,10 @@ name: Publish
 on:
   workflow_dispatch:
     inputs:
-      logLevel:
-        description: Enter a version prefix for this release
+      suffix:
+        description: 'Release suffix'
         required: true
-        type: string
+
 jobs:
   deploy:
     runs-on: windows-latest
@@ -18,15 +18,15 @@ jobs:
         with:
           dotnet-version: 6.0.x
       - name: dotnet publish
-        run: dotnet publish -c Release -r win-x64 --self-contained false -p:PublishSingleFile=true -p:DebugType=None -p:DebugSymbols=false
+        run: "dotnet publish -c Release -r win-x64 --self-contained false -p:PublishSingleFile=true -p:DebugType=None -p:DebugSymbols=false"
       - name: Archive the release
         uses: thedoctor0/zip-release@main
         with:
           type: zip
-          path: FFmpegGui/bin/Release/net6.0-windows/win-x64/publish
-          filename: FFmpegGui-${{ github.ref_name }}.zip
+          directory: bin/Release/net6.0-windows/win-x64/publish
+          filename: FFmpegGui-${{ inputs.suffix }}.zip
       - name: Upload Release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: FFmpegGui-${{ github.ref_name }}.zip
-          token: ${{ secrets.GITHUB_TOKEN }}
+          artifacts: bin/Release/net6.0-windows/win-x64/publish/FFmpegGui-${{ inputs.suffix }}.zip
+          tag: ${{ inputs.suffix }}
