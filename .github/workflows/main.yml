@@ -1,8 +1,11 @@
 ---
 name: Publish
 on:
-  push:
-    branches: [ master ]
+  workflow_dispatch:
+    inputs:
+      prefix:
+        description: 'Release prefix'
+        required: true
 
 jobs:
   deploy:
@@ -15,7 +18,7 @@ jobs:
         with:
           dotnet-version: 6.0.x
       - name: dotnet publish
-        run: dotnet publish -c Release -r win-x64 --self-contained false -p:PublishSingleFile=true -p:DebugType=None -p:DebugSymbols=false
+        run: "dotnet publish -c Release -r win-x64 --self-contained false -p:PublishSingleFile=true -p:DebugType=None -p:DebugSymbols=false"
       - name: Archive the release
         uses: thedoctor0/zip-release@main
         with:
