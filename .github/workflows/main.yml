@@ -23,10 +23,10 @@ jobs:
         uses: thedoctor0/zip-release@main
         with:
           type: zip
-          path: bin/Release/net6.0-windows/win-x64/publish
+          directory: bin/Release/net6.0-windows/win-x64/publish
           filename: FFmpegGui-${{ inputs.suffix }}.zip
       - name: Upload Release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: FFmpegGui-${{ inputs.suffix }}.zip
+          artifacts: bin/Release/net6.0-windows/win-x64/publish/FFmpegGui-${{ inputs.suffix }}.zip
           tag: ${{ inputs.suffix }}
