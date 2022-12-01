@@ -90,6 +90,11 @@
             <GroupBox BorderThickness="0" Background="#282828">
                 <StackPanel Orientation="Vertical">
                     <CheckBox x:Name="ChkTrimEnabled" Foreground="White" Content="Trim?"
+                              IsEnabled="{Binding IsDebug}"
+                              ToolTip="This feature is not ready yet!"
+                              ToolTipService.IsEnabled="{Binding IsNotDebug}"
+                              ToolTipService.ShowOnDisabled="True"
+                              ToolTipService.InitialShowDelay="250"
                               IsChecked="{Binding IsTrimEnabled,Mode=TwoWay}" />
                     <Grid Margin="5" IsEnabled="{Binding IsTrimEnabled}">
                         <Grid.ColumnDefinitions>
