@@ -3,8 +3,8 @@ name: Publish
 on:
   workflow_dispatch:
     inputs:
-      prefix:
-        description: 'Release prefix'
+      suffix:
+        description: 'Release suffix'
         required: true
 
 jobs:
@@ -23,10 +23,10 @@ jobs:
         uses: thedoctor0/zip-release@main
         with:
           type: zip
-          path: FFmpegGui/bin/Release/net6.0-windows/win-x64/publish
+          path: bin/Release/net6.0-windows/win-x64/publish
           filename: FFmpegGui-${{ github.ref_name }}.zip
       - name: Upload Release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: FFmpegGui-${{ github.ref_name }}.zip
+          artifacts: FFmpegGui-${{ inputs.suffix }}.zip
           token: ${{ secrets.GITHUB_TOKEN }}
