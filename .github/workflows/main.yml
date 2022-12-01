@@ -29,4 +29,4 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           artifacts: FFmpegGui-${{ inputs.suffix }}.zip
-          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ inputs.suffix }}
