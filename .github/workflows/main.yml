@@ -8,8 +8,22 @@ jobs:
   deploy:
     runs-on: windows-latest
     steps:
+      - name: Initialize Actions
       - uses: actions/checkout@v3
+      - name: Setup dotnet
       - uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '6.0.x'
+      - name: dotnet publish
       - run: dotnet publish -c Release -r win-x64 --self-contained false -p:PublishSingleFile=true -p:DebugType=None -p:DebugSymbols=false
+      - name: Archive the release
+        uses: thedoctor0/zip-release@main
+        with:
+          type: 'zip'
+          path: 'FFmpegGui/bin/Release/net6.0-windows/win-x64/publish'
+          filename: FFmpegGui-${{ github.ref_name }}.zip
+      - name: Upload Release
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: FFmpegGui-${{ github.ref_name }}.zip
+          token: ${{ secrets.GITHUB_TOKEN }}
