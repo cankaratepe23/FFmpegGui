@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
@@ -366,8 +367,14 @@ public partial class MainWindow : INotifyPropertyChanged
     {
         if (await EnsureGifskiInstalled() && await EnsureFfmpegInstalled())
         {
-            // TODO: Run ffmpeg to get frames and gifski to convert to gif
+            // TODO: Add textboxes to configure ffmpeg and gifski options
+            // ffmpeg: framerate
+            // gifski: quality, fps, width
+            // TODO: Get width and fps automatically from source video
             var framesDir = await FfmpegService.GetFramesAsync(FilePath);
+            var gifPath = await GifskiService.ConvertToGif(framesDir);
+            File.Copy(gifPath, Path.GetFileNameWithoutExtension(FilePath) + ".gif", false);
+            Directory.Delete(framesDir, true);
         }
         else
         {

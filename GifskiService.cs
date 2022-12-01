@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -72,5 +73,28 @@ public class GifskiService : ConversionToolService
         File.Delete(filename);
         Util.LogToUser("Done!");
         return true;
+    }
+
+    public static async Task<string> ConvertToGif(string framesDir)
+    {
+        var proc = new Process
+        {
+            StartInfo = new ProcessStartInfo
+            {
+                FileName = "gifski.exe",
+                WorkingDirectory = framesDir,
+                Arguments = $"-o output.gif frame*.png",
+                UseShellExecute = false,
+                CreateNoWindow = true
+            }
+        };
+        
+#if DEBUG
+        proc.StartInfo.RedirectStandardError = true;
+#endif
+        proc.Start();
+        await proc.WaitForExitAsync();
+        Util.LogToUser("Created GIF file");
+        return Path.Combine(framesDir, "output.gif");
     }
 }
