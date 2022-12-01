@@ -1,9 +1,13 @@
 name: "Publish"
 
 on:
-  push:
-    tags:
-      - "v*"
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Enter a version prefix for this release'
+        required: true
+        type: string
+
 jobs:
   deploy:
     runs-on: windows-latest
