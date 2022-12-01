@@ -192,6 +192,29 @@
                 </StackPanel>
             </GroupBox>
 
+            <GroupBox BorderThickness="0" Background="#282828">
+                <Grid Margin="5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                            <TextBlock          Grid.Row="0" Grid.Column="0" Padding="5,2,5,2">Source FPS (-r):</TextBlock>
+                            <xctk:IntegerUpDown Grid.Row="0" Grid.Column="1" Padding="2" Text="{Binding FfmpegFps, Mode=TwoWay}"/>
+                            <TextBlock          Grid.Row="1" Grid.Column="0" Padding="5,2,5,2">Output FPS (--fps):</TextBlock>
+                            <xctk:IntegerUpDown Grid.Row="1" Grid.Column="1" Padding="2" Text="{Binding GifskiFps, Mode=TwoWay}"/>
+                            <TextBlock          Grid.Row="2" Grid.Column="0" Padding="5,2,5,2">Quality (--quality):</TextBlock>
+                            <xctk:IntegerUpDown Grid.Row="2" Grid.Column="1" Padding="2" Text="{Binding GifskiQuality, Mode=TwoWay}"/>
+                            <TextBlock          Grid.Row="3" Grid.Column="0" Padding="5,2,5,2">Width (--width):</TextBlock>
+                            <xctk:IntegerUpDown Grid.Row="3" Grid.Column="1" Padding="2" Text="{Binding GifskiWidth, Mode=TwoWay}"/>
+                </Grid>
+            </GroupBox>
+            
             <!-- Convert buttons -->
             <Grid Height="24" Margin="5">
                 <Grid.ColumnDefinitions>

@@ -150,7 +150,7 @@ public class FfmpegService : ConversionToolService
         return readValues.ToArray();
     }
 
-    public static async Task<string> GetFramesAsync(string filePath)
+    public static async Task<string> GetFramesAsync(string filePath, int fps)
     {
         var outputDir = Util.GetTemporaryDirectory();
         while (File.Exists(outputDir))

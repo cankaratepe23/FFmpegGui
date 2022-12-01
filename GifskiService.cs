@@ -75,7 +75,7 @@ public class GifskiService : ConversionToolService
         return true;
     }
 
-    public static async Task<string> ConvertToGif(string framesDir)
+    public static async Task<string> ConvertToGif(string framesDir, int fps, int quality, int width)
     {
         var proc = new Process
         {

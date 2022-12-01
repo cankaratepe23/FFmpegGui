@@ -349,6 +349,14 @@ public partial class MainWindow : INotifyPropertyChanged
 
     public double CurrentFps { get; set; }
 
+    public int FfmpegFps { get; set; }
+
+    public int GifskiFps { get; set; }
+
+    public int GifskiQuality { get; set; }
+
+    public int GifskiWidth { get; set; }
+    
     #endregion
 
     #region Events
@@ -367,12 +375,10 @@ public partial class MainWindow : INotifyPropertyChanged
     {
         if (await EnsureGifskiInstalled() && await EnsureFfmpegInstalled())
         {
-            // TODO: Add textboxes to configure ffmpeg and gifski options
-            // ffmpeg: framerate
-            // gifski: quality, fps, width
-            // TODO: Get width and fps automatically from source video
-            var framesDir = await FfmpegService.GetFramesAsync(FilePath);
-            var gifPath = await GifskiService.ConvertToGif(framesDir);
+            // TODO: Refactor these GET methods into private methods for "run FFmpeg/gifski with given argument"
+            // TODO: Handle 0 (or negative or whatever) values for empty textboxes in Service methods
+            var framesDir = await FfmpegService.GetFramesAsync(FilePath, FfmpegFps);
+            var gifPath = await GifskiService.ConvertToGif(framesDir, GifskiFps, GifskiQuality, GifskiWidth);
             File.Copy(gifPath, Path.GetFileNameWithoutExtension(FilePath) + ".gif", false);
             Directory.Delete(framesDir, true);
         }
